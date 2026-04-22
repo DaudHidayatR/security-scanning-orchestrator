@@ -1,0 +1,91 @@
+name = "security-scan-orchestrator"
+main = "src/index.ts"
+compatibility_date = "2026-04-21"
+
+# Minification
+minify = true
+
+# Workers AI binding
+[ai]
+binding = "AI"
+
+# D1 Database for findings and webhook deliveries (Phase 1)
+# Replace database_id after running: wrangler d1 create security-findings
+[[d1_databases]]
+binding = "DB"
+database_name = "security-findings"
+database_id = "your-d1-id"
+
+# R2 Bucket for raw scanner reports
+[[r2_buckets]]
+binding = "REPORTS"
+bucket_name = "security-raw-reports"
+
+# KV Namespace for caching and neuron usage tracking
+# Replace id after running: wrangler kv:namespace create CACHE
+[[kv_namespaces]]
+binding = "CACHE"
+id = "your-kv-id"
+
+# --- Queues ---
+
+# Standard security scanner jobs (Semgrep + regex fallback)
+[[queues.producers]]
+binding = "scannerJobs"
+queue = "scanner-jobs"
+[[queues.consumers]]
+queue = "scanner-jobs"
+max_batch_size = 10
+max_batch_timeout = 30
+
+# AI validation jobs (exploitability assessment, fix generation)
+[[queues.producers]]
+binding = "aiValidation"
+queue = "ai-validation"
+[[queues.consumers]]
+queue = "ai-validation"
+max_batch_size = 5
+max_batch_timeout = 60
+
+# AI validation priority jobs (critical/high severity findings)
+[[queues.producers]]
+binding = "aiValidationPriority"
+queue = "ai-validation-priority"
+[[queues.consumers]]
+queue = "ai-validation-priority"
+max_batch_size = 5
+max_batch_timeout = 5
+
+# Fix validation jobs (Dynamic Workers sandbox)
+[[queues.producers]]
+binding = "fixValidation"
+queue = "fix-validation"
+[[queues.consumers]]
+queue = "fix-validation"
+max_batch_size = 3
+max_batch_timeout = 120
+
+# Rule testing jobs (user-defined Semgrep rules)
+[[queues.producers]]
+binding = "ruleTesting"
+queue = "rule-testing"
+[[queues.consumers]]
+queue = "rule-testing"
+max_batch_size = 1
+max_batch_timeout = 180
+
+# Workers for Platforms dispatch namespace (sandbox)
+[[dispatch_namespaces]]
+binding = "LOADER"
+namespace = "security-sandbox-ns"
+
+# --- Cron Triggers ---
+# Reset daily neuron counter at midnight UTC
+[triggers]
+crons = ["0 0 * * *"]
+
+# --- Environment Variables (non-secrets) ---
+[vars]
+ENVIRONMENT = "production"
+AI_MODEL_DEFAULT = "@cf/meta/llama-3.1-8b-instruct-fp8-fast"
+AI_MODEL_PREMIUM = "@cf/qwen/qwen2.5-coder-32b-instruct"
