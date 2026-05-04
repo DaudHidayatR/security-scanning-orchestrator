@@ -6,7 +6,7 @@ export interface Env {
   // Cloudflare bindings
   AI: unknown;
   DB: D1Database;
-  REPORTS: R2Bucket;
+  // REPORTS: R2Bucket; // Phase 2+ — enable in wrangler.toml when R2 is activated
   CACHE: KVNamespace;
 
   // Queue bindings
@@ -17,7 +17,7 @@ export interface Env {
   ruleTesting: Queue<RuleTestingMessage>;
 
   // Workers for Platforms dispatch namespace
-  LOADER: DispatchNamespace;
+  // LOADER: DispatchNamespace; // Phase 4+ — enable in wrangler.toml when Workers for Platforms is available
 
   // Secrets (injected at runtime)
   CF_ACCOUNT_ID: string;

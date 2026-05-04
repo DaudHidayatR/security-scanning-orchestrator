@@ -14,18 +14,19 @@ binding = "AI"
 [[d1_databases]]
 binding = "DB"
 database_name = "security-findings"
-database_id = "your-d1-id"
+database_id = "d8634473-5161-4957-98c0-7c41f1412c51"
 
 # R2 Bucket for raw scanner reports
-[[r2_buckets]]
-binding = "REPORTS"
-bucket_name = "security-raw-reports"
-
+# R2 Bucket for raw scanner reports
+# NOTE: Enable R2 in Cloudflare Dashboard first, then uncomment
+# [[r2_buckets]]
+# binding = "BUCKET"
+# bucket_name = "security-raw-reports"
 # KV Namespace for caching and neuron usage tracking
 # Replace id after running: wrangler kv:namespace create CACHE
 [[kv_namespaces]]
 binding = "CACHE"
-id = "your-kv-id"
+id = "dbc2cac694904216858d26494a652bf1"
 
 # --- Queues ---
 
@@ -63,7 +64,7 @@ queue = "fix-validation"
 [[queues.consumers]]
 queue = "fix-validation"
 max_batch_size = 3
-max_batch_timeout = 120
+max_batch_timeout = 60
 
 # Rule testing jobs (user-defined Semgrep rules)
 [[queues.producers]]
@@ -72,12 +73,13 @@ queue = "rule-testing"
 [[queues.consumers]]
 queue = "rule-testing"
 max_batch_size = 1
-max_batch_timeout = 180
+max_batch_timeout = 60
 
 # Workers for Platforms dispatch namespace (sandbox)
-[[dispatch_namespaces]]
-binding = "LOADER"
-namespace = "security-sandbox-ns"
+# NOTE: Requires Workers for Platforms (paid). Uncomment when available.
+# [[dispatch_namespaces]]
+# binding = "LOADER"
+# namespace = "security-sandbox-ns"
 
 # --- Cron Triggers ---
 # Reset daily neuron counter at midnight UTC
